@@ -126,7 +126,7 @@ export const ProductVariant = forwardRef<HTMLDivElement, VariantProps>(
     return (
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger>{children}</DialogTrigger>
-        <DialogContent className="lg:max-w-screen-lg overflow-y-scroll max-h-[860px]">
+        <DialogContent className="lg:max-w-screen-lg overflow-y-scroll max-h-[560px]">
           <DialogHeader>
             <DialogTitle>
               {editMode ? "Edit" : "Create"} your variant
