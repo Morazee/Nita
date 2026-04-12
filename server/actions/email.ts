@@ -11,7 +11,7 @@ export const sendTwoFactorTokenByEmail = async (
   token: string
 ) => {
   const { data, error } = await resend.emails.send({
-    from: "support@nita.store",
+    from: "support@nita.llc",
     to: email,
     subject: "Nita Store - Your 2 Factor Token",
     html: `<p>Your Confirmation Code: ${token}</p>`,
@@ -23,7 +23,7 @@ export const sendTwoFactorTokenByEmail = async (
 export const sendVerificationEmail = async (email: string, token: string) => {
   const confirmLink = `${domain}/auth/new-verification?token=${token}`
   const { data, error } = await resend.emails.send({
-    from: "support@nita.store",
+    from: "support@nita.llc",
     to: email,
     subject: "Nita Store - Confirmation Email",
     html: `<p>Click to <a href='${confirmLink}'>confirm your email</a></p>`,
@@ -35,7 +35,7 @@ export const sendVerificationEmail = async (email: string, token: string) => {
 export const sendPasswordResetEmail = async (email: string, token: string) => {
   const confirmLink = `${domain}/auth/new-password?token=${token}`
   const { data, error } = await resend.emails.send({
-    from: "support@nita.store",
+    from: "support@nita.llc",
     to: email,
     subject: "Nita Store - Confirmation Email",
     html: `<p>Click here <a href='${confirmLink}'>reset your password</a></p>`,
