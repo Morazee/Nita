@@ -111,7 +111,7 @@ export const LoginForm = () => {
                         <FormControl>
                           <Input
                             {...field}
-                            placeholder="Support@nita.store"
+                            placeholder="Support@nita.llc"
                             type="email"
                             autoComplete="email"
                           />
