@@ -85,7 +85,7 @@ export const RegisterForm = () => {
                     <FormControl>
                       <Input
                         {...field}
-                        placeholder="Support@nita.store"
+                        placeholder="Support@nita.llc"
                         type="email"
                         autoComplete="email"
                       />
