@@ -29,6 +29,7 @@ export const createProduct = action(
           .where(eq(products.id, id))
           .returning()
         revalidatePath("/dashboard/products")
+        revalidatePath("/")
         return { success: `Product ${editedProduct[0].title} has been edited` }
       }
       if (!id) {
@@ -37,6 +38,7 @@ export const createProduct = action(
           .values({ description, price, title })
           .returning()
         revalidatePath("/dashboard/products")
+        revalidatePath("/")
         return { success: `Product ${newProduct[0].title} has been created` }
       }
     } catch (err) {

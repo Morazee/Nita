@@ -28,7 +28,8 @@ export const deleteVariant = action(
         .delete(productVariants)
         .where(eq(productVariants.id, id))
         .returning()
-      revalidatePath("dashboard/products")
+      revalidatePath("/dashboard/products")
+      revalidatePath("/")
       await getAlgoliaIndex().deleteObject(deletedVariant[0].id.toString())
       return { success: `Deleted ${deletedVariant[0].productType}` }
     } catch (error) {

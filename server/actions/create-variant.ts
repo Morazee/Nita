@@ -72,6 +72,7 @@ export const createVariant = action(
           variantImages: newImgs[0].url,
         })
         revalidatePath("/dashboard/products")
+        revalidatePath("/")
         return { success: `Edited ${productType}` }
       }
       if (!editMode) {
@@ -112,6 +113,7 @@ export const createVariant = action(
           })
         }
         revalidatePath("/dashboard/products")
+        revalidatePath("/")
         return { success: `Added ${productType}` }
       }
     } catch (error) {

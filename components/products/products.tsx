@@ -8,6 +8,7 @@ import formatPrice from "@/lib/format-price"
 import { useMemo } from "react"
 import { useSearchParams } from "next/navigation"
 import { getVariantImage } from "@/lib/product-image"
+import { variantMatchesColorFilter } from "@/lib/variant-color-filter"
 
 type ProductTypes = {
   variants: VariantsWithProduct[]
@@ -18,12 +19,7 @@ export default function Products({ variants }: ProductTypes) {
   const paramTag = params.get("tag")
 
   const filtered = useMemo(() => {
-    if (paramTag && variants) {
-      return variants.filter((variant) =>
-        variant.variantTags.some((tag) => tag.tag === paramTag)
-      )
-    }
-    return variants
+    return variants.filter((variant) => variantMatchesColorFilter(variant, paramTag))
   }, [paramTag, variants])
 
   return (
