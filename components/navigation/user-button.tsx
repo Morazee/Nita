@@ -6,46 +6,47 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import Image from "next/image"
-import { Suspense, useEffect, useState } from "react"
-import { LogOut, Moon, Settings, Sun, Truck, TruckIcon } from "lucide-react"
+import { LogOut, Moon, Settings, Sun, TruckIcon } from "lucide-react"
 import { useTheme } from "next-themes"
 import { Switch } from "../ui/switch"
-import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useCartStore } from "@/lib/client-store"
+import {
+  DEFAULT_THEME,
+  getUserThemeStorageKey,
+  normalizeTheme,
+  StoredTheme,
+} from "@/lib/theme-storage"
 
 export const UserButton = ({ user }: Session) => {
-  const { setTheme, theme } = useTheme()
-  const [checked, setChecked] = useState(false)
+  const { setTheme, theme, resolvedTheme } = useTheme()
   const router = useRouter()
   const { clearCart, setCartOpen, setCheckoutProgress } = useCartStore()
+  const activeTheme = normalizeTheme(resolvedTheme || theme)
 
-  function setSwitchState() {
-    switch (theme) {
-      case "dark":
-        return setChecked(true)
-      case "light":
-        return setChecked(false)
-      case "system":
-        return setChecked(false)
-    }
+  function saveUserTheme(nextTheme: StoredTheme) {
+    if (!user?.id) return
+    window.localStorage.setItem(getUserThemeStorageKey(user.id), nextTheme)
   }
 
-  useEffect(() => {
-    setSwitchState()
-  }, [])
+  function handleThemeChange(checked: boolean) {
+    const nextTheme = checked ? "dark" : DEFAULT_THEME
+    saveUserTheme(nextTheme)
+    setTheme(nextTheme)
+  }
 
   function handleSignOut() {
+    saveUserTheme(activeTheme)
+    setTheme(DEFAULT_THEME)
     clearCart()
     setCheckoutProgress("cart-page")
     setCartOpen(false)
-    signOut()
+    signOut({ callbackUrl: "/" })
   }
 
   if (user)
@@ -120,16 +121,12 @@ export const UserButton = ({ user }: Session) => {
                   />
                 </div>
                 <p className="dark:text-blue-400 mr-3 text-secondary-foreground/75   text-yellow-600">
-                  {theme[0].toUpperCase() + theme.slice(1)} Mode
+                  {activeTheme[0].toUpperCase() + activeTheme.slice(1)} Mode
                 </p>
                 <Switch
                   className="scale-75 "
-                  checked={checked}
-                  onCheckedChange={(e) => {
-                    setChecked((prev) => !prev)
-                    if (e) setTheme("dark")
-                    if (!e) setTheme("light")
-                  }}
+                  checked={activeTheme === "dark"}
+                  onCheckedChange={handleThemeChange}
                 />
               </div>
             </DropdownMenuItem>
