@@ -24,7 +24,6 @@ export default function CartDrawer({ isAuthenticated }: CartDrawerProps) {
     cart,
     checkoutProgress,
     setCheckoutProgress,
-    clearCart,
     cartOpen,
     setCartOpen,
   } = useCartStore()
@@ -33,14 +32,10 @@ export default function CartDrawer({ isAuthenticated }: CartDrawerProps) {
   useEffect(() => {
     if (isAuthenticated) return
 
-    if (cart.length > 0) {
-      clearCart()
-    }
-
     if (checkoutProgress !== "cart-page") {
       setCheckoutProgress("cart-page")
     }
-  }, [cart.length, checkoutProgress, clearCart, isAuthenticated, setCheckoutProgress])
+  }, [checkoutProgress, isAuthenticated, setCheckoutProgress])
 
   return (
     <Drawer open={cartOpen} onOpenChange={setCartOpen}>

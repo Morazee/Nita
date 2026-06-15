@@ -6,12 +6,14 @@ import { Button } from "../ui/button"
 import { LogIn } from "lucide-react"
 import CartDrawer from "../cart/cart-drawer"
 import ThemeSessionSync from "@/components/providers/theme-session-sync"
+import CartSessionSync from "@/components/providers/cart-session-sync"
 
 export default async function Nav() {
   const session = await auth()
   return (
     <header className="py-8">
       <ThemeSessionSync userId={session?.user?.id} />
+      <CartSessionSync userId={session?.user?.id} />
       <nav>
         <ul className="flex justify-between items-center md:gap-8 gap-4">
           <li className="flex flex-1">

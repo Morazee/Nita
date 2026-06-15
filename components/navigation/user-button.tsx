@@ -16,6 +16,7 @@ import { useTheme } from "next-themes"
 import { Switch } from "../ui/switch"
 import { useRouter } from "next/navigation"
 import { useCartStore } from "@/lib/client-store"
+import { saveUserCart } from "@/lib/cart-storage"
 import {
   DEFAULT_THEME,
   getUserThemeStorageKey,
@@ -26,7 +27,7 @@ import {
 export const UserButton = ({ user }: Session) => {
   const { setTheme, theme, resolvedTheme } = useTheme()
   const router = useRouter()
-  const { clearCart, setCartOpen, setCheckoutProgress } = useCartStore()
+  const { cart, setCartOpen, setCheckoutProgress } = useCartStore()
   const activeTheme = normalizeTheme(resolvedTheme || theme)
 
   function saveUserTheme(nextTheme: StoredTheme) {
@@ -42,8 +43,10 @@ export const UserButton = ({ user }: Session) => {
 
   function handleSignOut() {
     saveUserTheme(activeTheme)
+    if (user?.id) {
+      saveUserCart(user.id, cart)
+    }
     setTheme(DEFAULT_THEME)
-    clearCart()
     setCheckoutProgress("cart-page")
     setCartOpen(false)
     signOut({ callbackUrl: "/" })
