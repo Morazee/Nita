@@ -7,6 +7,7 @@ import { Badge } from "../ui/badge"
 import formatPrice from "@/lib/format-price"
 import { useMemo } from "react"
 import { useSearchParams } from "next/navigation"
+import { getVariantImage } from "@/lib/product-image"
 
 type ProductTypes = {
   variants: VariantsWithProduct[]
@@ -23,7 +24,7 @@ export default function Products({ variants }: ProductTypes) {
       )
     }
     return variants
-  }, [paramTag])
+  }, [paramTag, variants])
 
   return (
     <main className="grid sm:grid-cols-1 md:grid-cols-2 gap-12 lg:grid-cols-3">
@@ -31,11 +32,11 @@ export default function Products({ variants }: ProductTypes) {
         <Link
           className="py-2"
           key={variant.id}
-          href={`/products/${variant.id}?id=${variant.id}&productID=${variant.productID}&price=${variant.product.price}&title=${variant.product.title}&type=${variant.productType}&image=${variant.variantImages[0].url}`}
+          href={`/products/${variant.id}`}
         >
           <Image
             className="rounded-md pb-2"
-            src={variant.variantImages[0].url}
+            src={getVariantImage(variant)}
             width={720}
             height={480}
             alt={variant.product.title}

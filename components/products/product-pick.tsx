@@ -1,40 +1,29 @@
 "use client"
 
-import { useRouter, useSearchParams } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 export default function ProductPick({
   id,
   color,
   productType,
-  title,
-  price,
-  productID,
-  image,
+  selected,
 }: {
   id: number
   color: string
   productType: string
-  title: string
-  price: number
-  productID: number
-  image: string
+  selected: boolean
 }) {
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const selectedColor = searchParams.get("type" || productType)
   return (
     <div
       style={{ background: color }}
+      aria-label={`Select ${productType}`}
+      title={productType}
       className={cn(
         "w-8 h-8 rounded-full cursor-pointer transition-all duration-300 ease-in-out hober: opacity-75",
-        selectedColor === productType ? "opacity-100" : "opacity-50"
+        selected ? "opacity-100 ring-2 ring-primary ring-offset-2" : "opacity-50"
       )}
-      onClick={() =>
-        router.push(
-          `/products/${id}?id=${id}&productID=${productID}&price=${price}&title=${title}&type=${productType}&image=${image}`,
-          { scroll: false }
-        )
-      }
+      onClick={() => router.push(`/products/${id}`, { scroll: false })}
     ></div>
   )
 }

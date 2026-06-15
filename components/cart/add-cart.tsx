@@ -5,23 +5,28 @@ import { useState } from "react"
 import { Button } from "../ui/button"
 import { Minus, Plus } from "lucide-react"
 import { toast } from "sonner"
-import { redirect, useSearchParams } from "next/navigation"
 
-export default function AddCart() {
+type AddCartProps = {
+  productID: number
+  variantID: number
+  title: string
+  productType: string
+  price: number
+  image: string
+}
+
+export default function AddCart({
+  productID,
+  variantID,
+  title,
+  productType,
+  price,
+  image,
+}: AddCartProps) {
   const { addToCart } = useCartStore()
   const [quantity, setQuantity] = useState(1)
-  const params = useSearchParams()
-  const id = Number(params.get("id"))
-  const productID = Number(params.get("productID"))
-  const title = params.get("title")
-  const type = params.get("type")
-  const price = Number(params.get("price"))
-  const image = params.get("image")
+  const itemName = `${title} ${productType}`
 
-  if (!id || !productID || !title || !type || !price || !image) {
-    toast.error("Product not found")
-    return redirect("/")
-  }
   return (
     <>
       <div className="flex items-center gap-4 justify-stretch my-4">
@@ -51,11 +56,11 @@ export default function AddCart() {
       </div>
       <Button
         onClick={() => {
-          toast.success(`Added ${title + " " + type} to your cart!`)
+          toast.success(`Added ${itemName} to your cart!`)
           addToCart({
             id: productID,
-            variant: { variantID: id, quantity },
-            name: title + " " + type,
+            variant: { variantID, quantity },
+            name: itemName,
             price,
             image,
           })

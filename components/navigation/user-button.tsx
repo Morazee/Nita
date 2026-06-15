@@ -18,11 +18,13 @@ import { useTheme } from "next-themes"
 import { Switch } from "../ui/switch"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { useCartStore } from "@/lib/client-store"
 
 export const UserButton = ({ user }: Session) => {
   const { setTheme, theme } = useTheme()
   const [checked, setChecked] = useState(false)
   const router = useRouter()
+  const { clearCart, setCartOpen, setCheckoutProgress } = useCartStore()
 
   function setSwitchState() {
     switch (theme) {
@@ -38,6 +40,13 @@ export const UserButton = ({ user }: Session) => {
   useEffect(() => {
     setSwitchState()
   }, [])
+
+  function handleSignOut() {
+    clearCart()
+    setCheckoutProgress("cart-page")
+    setCartOpen(false)
+    signOut()
+  }
 
   if (user)
     return (
@@ -126,7 +135,7 @@ export const UserButton = ({ user }: Session) => {
             </DropdownMenuItem>
           )}
           <DropdownMenuItem
-            onClick={() => signOut()}
+            onClick={handleSignOut}
             className="py-2 group focus:bg-destructive/30 font-medium cursor-pointer "
           >
             <LogOut

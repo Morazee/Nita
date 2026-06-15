@@ -6,6 +6,7 @@ import { db } from ".."
 import { eq } from "drizzle-orm"
 import { products } from "../schema"
 import { revalidatePath } from "next/cache"
+import { requireAdmin } from "./admin"
 
 const action = createSafeActionClient()
 
@@ -13,6 +14,9 @@ export const createProduct = action(
   ProductSchema,
   async ({ description, price, title, id }) => {
     try {
+      const admin = await requireAdmin()
+      if ("error" in admin) return { error: admin.error }
+
       //EDIT MODE
       if (id) {
         const currentProduct = await db.query.products.findFirst({

@@ -7,7 +7,7 @@ import Credentials from "next-auth/providers/credentials"
 import { LoginSchema } from "@/types/login-schema"
 import { eq } from "drizzle-orm"
 import { accounts, users } from "./schema"
-import bcrypt from "bcrypt"
+import bcrypt from "bcryptjs"
 import Stripe from "stripe"
 
 export const { handlers, auth, signIn, signOut } = NextAuth({

@@ -5,7 +5,19 @@ import { signIn } from "next-auth/react"
 import { FcGoogle } from "react-icons/fc"
 import { FaGithub } from "react-icons/fa"
 
-export default function Socials() {
+type SocialsProps = {
+  callbackUrl?: string
+}
+
+function getSafeCallbackUrl(callbackUrl?: string) {
+  if (!callbackUrl) return "/"
+  if (!callbackUrl.startsWith("/") || callbackUrl.startsWith("//")) return "/"
+  return callbackUrl
+}
+
+export default function Socials({ callbackUrl }: SocialsProps) {
+  const safeCallbackUrl = getSafeCallbackUrl(callbackUrl)
+
   return (
     <div className="flex flex-col items-center w-full gap-4">
       <Button
@@ -13,8 +25,7 @@ export default function Socials() {
         className="flex gap-4 w-full"
         onClick={() =>
           signIn("google", {
-            redirect: false,
-            callbackUrl: "/",
+            callbackUrl: safeCallbackUrl,
           })
         }
       >
@@ -26,8 +37,7 @@ export default function Socials() {
         variant={"outline"}
         onClick={() =>
           signIn("github", {
-            redirect: false,
-            callbackUrl: "/",
+            callbackUrl: safeCallbackUrl,
           })
         }
       >

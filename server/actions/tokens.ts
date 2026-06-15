@@ -13,7 +13,18 @@ import crypto from "crypto"
 export const getVerificationTokenByEmail = async (email: string) => {
   try {
     const verificationToken = await db.query.emailTokens.findFirst({
-      where: eq(emailTokens.token, email),
+      where: eq(emailTokens.email, email),
+    })
+    return verificationToken
+  } catch (error) {
+    return null
+  }
+}
+
+export const getVerificationTokenByToken = async (token: string) => {
+  try {
+    const verificationToken = await db.query.emailTokens.findFirst({
+      where: eq(emailTokens.token, token),
     })
     return verificationToken
   } catch (error) {
@@ -43,7 +54,7 @@ export const generateEmailVerificationToken = async (email: string) => {
 }
 
 export const newVerification = async (token: string) => {
-  const existingToken = await getVerificationTokenByEmail(token)
+  const existingToken = await getVerificationTokenByToken(token)
   if (!existingToken) return { error: "Token not found" }
   const hasExpired = new Date(existingToken.expires) < new Date()
 

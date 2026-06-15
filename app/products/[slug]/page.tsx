@@ -10,6 +10,7 @@ import Reviews from "@/components/reviews/reviews"
 import { getReviewAverage } from "@/lib/review-avarage"
 import Stars from "@/components/reviews/stars"
 import AddCart from "@/components/cart/add-cart"
+import { getVariantImage } from "@/lib/product-image"
 
 export const revalidate = 60
 
@@ -45,6 +46,9 @@ export default async function Page({ params }: { params: { slug: string } }) {
   })
 
   if (variant) {
+    const selectedVariant =
+      variant.product.productVariants.find((prodVariant) => prodVariant.id === variant.id) ||
+      variant.product.productVariants[0]
     const reviewAvg = getReviewAverage(
       variant?.product.reviews.map((r) => r.rating)
     )
@@ -53,12 +57,18 @@ export default async function Page({ params }: { params: { slug: string } }) {
       <main>
         <section className="flex flex-col lg:flex-row gap-4 lg:gap-12">
           <div className="flex-1">
-            <ProductShowcase variants={variant.product.productVariants} />
+            <ProductShowcase
+              selectedVariantID={selectedVariant.id}
+              variants={variant.product.productVariants}
+            />
           </div>
           <div className="flex  flex-col flex-1">
             <h2 className="text-2xl font-bold">{variant?.product.title}</h2>
             <div>
-              <ProductType variants={variant.product.productVariants} />
+              <ProductType
+                selectedVariantID={selectedVariant.id}
+                variants={variant.product.productVariants}
+              />
               <Stars
                 rating={reviewAvg}
                 totalReviews={variant.product.reviews.length}
@@ -78,17 +88,21 @@ export default async function Page({ params }: { params: { slug: string } }) {
               {variant.product.productVariants.map((prodVariant) => (
                 <ProductPick
                   key={prodVariant.id}
-                  productID={variant.productID}
                   productType={prodVariant.productType}
                   id={prodVariant.id}
                   color={prodVariant.color}
-                  price={variant.product.price}
-                  title={variant.product.title}
-                  image={prodVariant.variantImages[0].url}
+                  selected={prodVariant.id === selectedVariant.id}
                 />
               ))}
             </div>
-            <AddCart />
+            <AddCart
+              productID={variant.productID}
+              variantID={selectedVariant.id}
+              title={variant.product.title}
+              productType={selectedVariant.productType}
+              price={variant.product.price}
+              image={getVariantImage(selectedVariant)}
+            />
           </div>
         </section>
         <Reviews productID={variant.productID} />

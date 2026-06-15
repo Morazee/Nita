@@ -15,10 +15,18 @@ import { AuthError } from "next-auth"
 
 const action = createSafeActionClient()
 
+function getSafeRedirectPath(callbackUrl?: string) {
+  if (!callbackUrl) return "/"
+  if (!callbackUrl.startsWith("/") || callbackUrl.startsWith("//")) return "/"
+  return callbackUrl
+}
+
 export const emailSignIn = action(
   LoginSchema,
-  async ({ email, password, code }) => {
+  async ({ email, password, code, callbackUrl }) => {
     try {
+      const redirectTo = getSafeRedirectPath(callbackUrl)
+
       //Check if the user is in the database
       const existingUser = await db.query.users.findFirst({
         where: eq(users.email, email),
@@ -73,7 +81,7 @@ export const emailSignIn = action(
       await signIn("credentials", {
         email,
         password,
-        redirectTo: "/",
+        redirectTo,
       })
 
       return { success: "User Signed In!" }

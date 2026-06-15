@@ -1,6 +1,12 @@
 import { LoginForm } from "@/components/auth/login-form"
 import { auth } from "@/server/auth"
 
-export default async function Login() {
-  return <LoginForm />
+type LoginPageProps = {
+  searchParams?: {
+    callbackUrl?: string
+  }
+}
+
+export default async function Login({ searchParams }: LoginPageProps) {
+  return <LoginForm callbackUrl={searchParams?.callbackUrl} />
 }

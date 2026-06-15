@@ -18,6 +18,7 @@ import {
 import { TotalOrders } from "@/lib/infer-type"
 import Image from "next/image"
 import placeholderUser from "@/public/placeholder-user.jpg"
+import { getVariantImage } from "@/lib/product-image"
 
 export default function Sales({ totalOrders }: { totalOrders: TotalOrders[] }) {
   const sliced = totalOrders.slice(0, 8)
@@ -71,7 +72,7 @@ export default function Sales({ totalOrders }: { totalOrders: TotalOrders[] }) {
                 <TableCell>{quantity}</TableCell>
                 <TableCell>
                   <Image
-                    src={productVariants.variantImages[0].url}
+                    src={getVariantImage(productVariants)}
                     width={48}
                     height={48}
                     alt={product.title}

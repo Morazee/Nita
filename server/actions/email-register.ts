@@ -1,7 +1,7 @@
 "use server"
 import { RegisterSchema } from "@/types/register-schema"
 import { createSafeActionClient } from "next-safe-action"
-import bcrpyt from "bcrypt"
+import bcrypt from "bcryptjs"
 import { db } from ".."
 import { eq } from "drizzle-orm"
 import { users } from "../schema"
@@ -14,7 +14,7 @@ export const emailRegister = action(
   RegisterSchema,
   async ({ email, name, password }) => {
     //We are hasing our password
-    const hashedPassword = await bcrpyt.hash(password, 10)
+    const hashedPassword = await bcrypt.hash(password, 10)
 
     //Check existing user
     const existingUser = await db.query.users.findFirst({

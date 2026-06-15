@@ -18,7 +18,7 @@ export default async function Nav() {
             </Link>
           </li>
           <li className="relative flex items-center hover:bg-muted">
-            <CartDrawer />
+            <CartDrawer isAuthenticated={!!session} />
           </li>
           {!session ? (
             <li className="flex items-center justify-center">

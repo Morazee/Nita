@@ -5,6 +5,7 @@ import { Card } from "../ui/card"
 import Image from "next/image"
 import { formatDistance, subDays } from "date-fns"
 import Stars from "./stars"
+import placeholderUser from "@/public/placeholder-user.jpg"
 
 export default function Review({ reviews }: { reviews: ReviewsWithUser[] }) {
   return (
@@ -16,8 +17,8 @@ export default function Review({ reviews }: { reviews: ReviewsWithUser[] }) {
               className="rounded-full"
               width={32}
               height={32}
-              alt={review.user.name!}
-              src={review.user?.image!}
+              alt={review.user.name || "User"}
+              src={review.user?.image || placeholderUser}
             />
             <div>
               <p className="text-sm font-bold">{review.user.name}</p>

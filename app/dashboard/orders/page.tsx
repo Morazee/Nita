@@ -41,6 +41,7 @@ import { Button } from "@/components/ui/button"
 import { MoreHorizontal } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
+import { getVariantImage } from "@/lib/product-image"
 
 export default async function Page() {
   const user = await auth()
@@ -153,7 +154,7 @@ export default async function Page() {
                                 <TableRow key={product.id}>
                                   <TableCell>
                                     <Image
-                                      src={productVariants.variantImages[0].url}
+                                      src={getVariantImage(productVariants)}
                                       width={48}
                                       height={48}
                                       alt={product.title}

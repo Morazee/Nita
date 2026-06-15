@@ -115,7 +115,7 @@ export const productVariants = pgTable("productVariants", {
   color: text("color").notNull(),
   productType: text("productType").notNull(),
   updated: timestamp("updated").defaultNow(),
-  productID: serial("productID")
+  productID: integer("productID")
     .notNull()
     .references(() => products.id, { onDelete: "cascade" }),
 })
@@ -126,7 +126,7 @@ export const variantImages = pgTable("variantImages", {
   size: real("size").notNull(),
   name: text("name").notNull(),
   order: real("order").notNull(),
-  variantID: serial("variantID")
+  variantID: integer("variantID")
     .notNull()
     .references(() => productVariants.id, { onDelete: "cascade" }),
 })
@@ -134,7 +134,7 @@ export const variantImages = pgTable("variantImages", {
 export const variantTags = pgTable("variantTags", {
   id: serial("id").primaryKey(),
   tag: text("tag").notNull(),
-  variantID: serial("variantID")
+  variantID: integer("variantID")
     .notNull()
     .references(() => productVariants.id, { onDelete: "cascade" }),
 })
@@ -181,7 +181,7 @@ export const reviews = pgTable(
     userID: text("userID")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    productID: serial("productID")
+    productID: integer("productID")
       .notNull()
       .references(() => products.id, { onDelete: "cascade" }),
     comment: text("comment").notNull(),
@@ -222,7 +222,7 @@ export const orders = pgTable("orders", {
   status: text("status").notNull(),
   created: timestamp("created").defaultNow(),
   receiptURL: text("receiptURL"),
-  paymentIntentID: text("paymentIntentID"),
+  paymentIntentID: text("paymentIntentID").unique(),
 })
 
 export const ordersRelations = relations(orders, ({ one, many }) => ({
@@ -237,13 +237,13 @@ export const ordersRelations = relations(orders, ({ one, many }) => ({
 export const orderProduct = pgTable("orderProduct", {
   id: serial("id").primaryKey(),
   quantity: integer("quantity").notNull(),
-  productVariantID: serial("productVariantID")
+  productVariantID: integer("productVariantID")
     .notNull()
     .references(() => productVariants.id, { onDelete: "cascade" }),
-  productID: serial("productID")
+  productID: integer("productID")
     .notNull()
     .references(() => products.id, { onDelete: "cascade" }),
-  orderID: serial("orderID")
+  orderID: integer("orderID")
     .notNull()
     .references(() => orders.id, { onDelete: "cascade" }),
 })

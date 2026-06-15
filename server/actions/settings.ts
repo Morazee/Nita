@@ -6,7 +6,7 @@ import { auth } from "../auth"
 import { db } from ".."
 import { eq } from "drizzle-orm"
 import { users } from "../schema"
-import bcrypt from "bcrypt"
+import bcrypt from "bcryptjs"
 import { revalidatePath } from "next/cache"
 
 const action = createSafeActionClient()

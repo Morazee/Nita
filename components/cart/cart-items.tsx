@@ -14,20 +14,34 @@ import { useMemo } from "react"
 import formatPrice from "@/lib/format-price"
 import Image from "next/image"
 import { MinusCircle, PlusCircle } from "lucide-react"
-import Lottie from "lottie-react"
 import emptyCart from "@/public/empty-box.json"
 import { createId } from "@paralleldrive/cuid2"
 import { Button } from "../ui/button"
+import dynamic from "next/dynamic"
+import { usePathname, useRouter } from "next/navigation"
+import { toast } from "sonner"
+import { PRODUCT_IMAGE_FALLBACK } from "@/lib/product-image"
 
-export default function CartItems() {
-  const { cart, addToCart, removeFromCart, setCheckoutProgress } =
+const Lottie = dynamic(() => import("lottie-react"), { ssr: false })
+
+type CartItemsProps = {
+  isAuthenticated: boolean
+}
+
+export default function CartItems({ isAuthenticated }: CartItemsProps) {
+  const { cart, addToCart, removeFromCart, setCheckoutProgress, setCartOpen } =
     useCartStore()
+  const pathname = usePathname()
+  const router = useRouter()
+  const visibleCart = isAuthenticated ? cart : []
 
   const totalPrice = useMemo(() => {
+    if (!isAuthenticated) return 0
+
     return cart.reduce((acc, item) => {
       return acc + item.price! * item.variant.quantity
     }, 0)
-  }, [cart])
+  }, [cart, isAuthenticated])
 
   const priceInLetters = useMemo(() => {
     return [...totalPrice.toFixed(2).toString()].map((letter) => {
@@ -35,9 +49,20 @@ export default function CartItems() {
     })
   }, [totalPrice])
 
+  const handleCheckout = () => {
+    if (!isAuthenticated) {
+      toast.error("Please login to checkout")
+      setCartOpen(false)
+      router.push(`/auth/login?callbackUrl=${encodeURIComponent(pathname)}`)
+      return
+    }
+
+    setCheckoutProgress("payment-page")
+  }
+
   return (
     <motion.div className="flex flex-col items-center">
-      {cart.length === 0 && (
+      {visibleCart.length === 0 && (
         <div className="flex-col w-full flex items-center justify-center">
           <motion.div
             animate={{ opacity: 1 }}
@@ -51,7 +76,7 @@ export default function CartItems() {
           </motion.div>
         </div>
       )}
-      {cart.length > 0 && (
+      {visibleCart.length > 0 && (
         <div className="max-h-80 w-full  overflow-y-auto">
           <Table className="max-w-2xl mx-auto">
             <TableHeader>
@@ -63,7 +88,7 @@ export default function CartItems() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {cart.map((item) => (
+              {visibleCart.map((item) => (
                 <TableRow key={(item.id + item.variant.variantID).toString()}>
                   <TableCell>{item.name}</TableCell>
                   <TableCell>{formatPrice(item.price)}</TableCell>
@@ -73,7 +98,7 @@ export default function CartItems() {
                         className="rounded-md"
                         width={48}
                         height={48}
-                        src={item.image}
+                        src={item.image || PRODUCT_IMAGE_FALLBACK}
                         alt={item.name}
                         priority
                       />
@@ -137,11 +162,9 @@ export default function CartItems() {
         </AnimatePresence>
       </motion.div>
       <Button
-        onClick={() => {
-          setCheckoutProgress("payment-page")
-        }}
+        onClick={handleCheckout}
         className="max-w-md w-full"
-        disabled={cart.length === 0}
+        disabled={visibleCart.length === 0}
       >
         Checkout
       </Button>

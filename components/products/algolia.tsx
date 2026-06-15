@@ -8,6 +8,7 @@ import Image from "next/image"
 import { Card } from "../ui/card"
 import { useMemo, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
+import { PRODUCT_IMAGE_FALLBACK } from "@/lib/product-image"
 
 function Hit({
   hit,
@@ -38,12 +39,10 @@ function Hit({
 }) {
   return (
     <div className="p-4 mb-2 hover:bg-secondary ">
-      <Link
-        href={`/products/${hit.objectID}?id=${hit.objectID}&productID=${hit.id}&price=${hit.price}&title=${hit.title}&type=${hit.productType}&image=${hit.variantImages[0]}&variantID=${hit.objectID}`}
-      >
+      <Link href={`/products/${hit.objectID}`}>
         <div className="flex w-full gap-12 items-center justify-between">
           <Image
-            src={hit.variantImages}
+            src={hit.variantImages || PRODUCT_IMAGE_FALLBACK}
             alt={hit.title}
             width={60}
             height={60}

@@ -50,14 +50,11 @@ export default function PaymentForm({ totalPrice }: { totalPrice: number }) {
       return
     }
     const { data } = await createPaymentIntent({
-      amount: totalPrice * 100,
       currency: "usd",
       cart: cart.map((item) => ({
         quantity: item.variant.quantity,
         productID: item.id,
-        title: item.name,
-        price: item.price,
-        image: item.image,
+        variantID: item.variant.variantID,
       })),
     })
     if (data?.error) {
@@ -84,9 +81,7 @@ export default function PaymentForm({ totalPrice }: { totalPrice: number }) {
       } else {
         setIsLoading(false)
         execute({
-          status: "pending",
           paymentIntentID: data.success.paymentIntentID,
-          total: totalPrice,
           products: cart.map((item) => ({
             productID: item.id,
             variantID: item.variant.variantID,

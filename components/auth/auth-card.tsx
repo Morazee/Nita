@@ -14,6 +14,7 @@ type CardWrapperProps = {
   backButtonHref: string
   backButtonLabel: string
   showSocials?: boolean
+  socialCallbackUrl?: string
 }
 
 export const AuthCard = ({
@@ -22,6 +23,7 @@ export const AuthCard = ({
   backButtonHref,
   backButtonLabel,
   showSocials,
+  socialCallbackUrl,
 }: CardWrapperProps) => {
   return (
     <Card>
@@ -31,7 +33,7 @@ export const AuthCard = ({
       <CardContent>{children}</CardContent>
       {showSocials && (
         <CardFooter>
-          <Socials />
+          <Socials callbackUrl={socialCallbackUrl} />
         </CardFooter>
       )}
       <CardFooter>

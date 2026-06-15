@@ -23,8 +23,6 @@ import { cn } from "@/lib/utils"
 import { useState } from "react"
 import { FormSuccess } from "./form-success"
 import { FormError } from "./form-error"
-import { useRouter } from "next/navigation"
-import { revalidatePath } from "next/cache"
 import {
   InputOTP,
   InputOTPGroup,
@@ -32,15 +30,26 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp"
 
-export const LoginForm = () => {
+type LoginFormProps = {
+  callbackUrl?: string
+}
+
+function getSafeCallbackUrl(callbackUrl?: string) {
+  if (!callbackUrl) return "/"
+  if (!callbackUrl.startsWith("/") || callbackUrl.startsWith("//")) return "/"
+  return callbackUrl
+}
+
+export const LoginForm = ({ callbackUrl }: LoginFormProps) => {
+  const safeCallbackUrl = getSafeCallbackUrl(callbackUrl)
   const form = useForm<z.infer<typeof LoginSchema>>({
     resolver: zodResolver(LoginSchema),
     defaultValues: {
       email: "",
       password: "",
+      callbackUrl: safeCallbackUrl,
     },
   })
-  const router = useRouter()
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
   const [showTwoFactor, setShowTwoFactor] = useState(false)
@@ -56,7 +65,10 @@ export const LoginForm = () => {
   })
 
   const onSubmit = (values: z.infer<typeof LoginSchema>) => {
-    execute(values)
+    execute({
+      ...values,
+      callbackUrl: safeCallbackUrl,
+    })
   }
 
   return (
@@ -64,6 +76,7 @@ export const LoginForm = () => {
       cardTitle="Welcome back!"
       backButtonHref="/auth/register"
       backButtonLabel="Create a new account"
+      socialCallbackUrl={safeCallbackUrl}
       showSocials
     >
       <div>

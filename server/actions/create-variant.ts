@@ -12,15 +12,16 @@ import {
 import { eq } from "drizzle-orm"
 import { revalidatePath } from "next/cache"
 import algoliasearch from "algoliasearch"
+import { requireAdmin } from "./admin"
 
 const action = createSafeActionClient()
 
-const client = algoliasearch(
-  process.env.NEXT_PUBLIC_ALGOLIA_ID!,
-  process.env.ALGOLIA_ADMIN!
-)
-
-const algoliaIndex = client.initIndex("products")
+function getAlgoliaIndex() {
+  const appId = process.env.NEXT_PUBLIC_ALGOLIA_ID
+  const adminKey = process.env.ALGOLIA_ADMIN
+  if (!appId || !adminKey) throw new Error("Algolia credentials are required")
+  return algoliasearch(appId, adminKey).initIndex("products")
+}
 
 export const createVariant = action(
   VariantSchema,
@@ -34,6 +35,9 @@ export const createVariant = action(
     variantImages: newImgs,
   }) => {
     try {
+      const admin = await requireAdmin()
+      if ("error" in admin) return { error: admin.error }
+
       if (editMode && id) {
         const editVariant = await db
           .update(productVariants)
@@ -61,7 +65,7 @@ export const createVariant = action(
             order: idx,
           }))
         )
-        algoliaIndex.partialUpdateObject({
+        await getAlgoliaIndex().partialUpdateObject({
           objectID: editVariant[0].id.toString(),
           id: editVariant[0].productID,
           productType: editVariant[0].productType,
@@ -98,7 +102,7 @@ export const createVariant = action(
           }))
         )
         if (product) {
-          algoliaIndex.saveObject({
+          await getAlgoliaIndex().saveObject({
             objectID: newVariant[0].id.toString(),
             id: newVariant[0].productID,
             title: product.title,

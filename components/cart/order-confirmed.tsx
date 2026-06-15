@@ -3,9 +3,11 @@
 import Link from "next/link"
 import { Button } from "../ui/button"
 import { useCartStore } from "@/lib/client-store"
-import Lottie from "lottie-react"
 import { motion } from "framer-motion"
 import orderConfirmed from "@/public/order-confirmed.json"
+import dynamic from "next/dynamic"
+
+const Lottie = dynamic(() => import("lottie-react"), { ssr: false })
 
 export default function OrderConfirmed() {
   const { setCheckoutProgress, setCartOpen } = useCartStore()

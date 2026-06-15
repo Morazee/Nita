@@ -9,20 +9,35 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel"
 import { VariantsWithImagesTags } from "@/lib/infer-type"
-import { useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 import Image from "next/image"
 import { cn } from "@/lib/utils"
+import { PRODUCT_IMAGE_FALLBACK } from "@/lib/product-image"
 
 export default function ProductShowcase({
   variants,
+  selectedVariantID,
 }: {
   variants: VariantsWithImagesTags[]
+  selectedVariantID: number
 }) {
   const [api, setApi] = useState<CarouselApi>()
   const [activeThumbnail, setActiveThumbnail] = useState([0])
-  const searchParams = useSearchParams()
-  const selectedColor = searchParams.get("type") || variants[0].productType
+  const selectedVariant =
+    variants.find((variant) => variant.id === selectedVariantID) || variants[0]
+  const selectedImages: { url: string; name: string }[] = selectedVariant.variantImages
+    .filter((image) => Boolean(image.url))
+    .map((image) => ({
+      url: image.url || PRODUCT_IMAGE_FALLBACK,
+      name: image.name || selectedVariant.productType,
+    }))
+
+  if (selectedImages.length === 0) {
+    selectedImages.push({
+      url: PRODUCT_IMAGE_FALLBACK,
+      name: selectedVariant.productType,
+    })
+  }
 
   const updatePreview = (index: number) => {
     api?.scrollTo(index)
@@ -41,54 +56,36 @@ export default function ProductShowcase({
   return (
     <Carousel setApi={setApi} opts={{ loop: true }}>
       <CarouselContent>
-        {variants.map(
-          (variant) =>
-            variant.productType === selectedColor &&
-            variant.variantImages.map((img) => {
-              return (
-                <CarouselItem key={img.url}>
-                  {img.url ? (
-                    <Image
-                      priority
-                      className="rounded-md"
-                      width={1280}
-                      height={720}
-                      src={img.url}
-                      alt={img.name}
-                    />
-                  ) : null}
-                </CarouselItem>
-              )
-            })
-        )}
+        {selectedImages.map((img, index) => (
+          <CarouselItem key={`${img.url}-${index}`}>
+            <Image
+              priority
+              className="rounded-md"
+              width={1280}
+              height={720}
+              src={img.url}
+              alt={img.name}
+            />
+          </CarouselItem>
+        ))}
       </CarouselContent>
       <div className="flex overflow-clip py-2 gap-4">
-        {variants.map(
-          (variant) =>
-            variant.productType === selectedColor &&
-            variant.variantImages.map((img, index) => {
-              return (
-                <div key={img.url}>
-                  {img.url ? (
-                    <Image
-                      onClick={() => updatePreview(index)}
-                      priority
-                      className={cn(
-                        index === activeThumbnail[0]
-                          ? "opacity-100"
-                          : "opacity-75",
-                        "rounded-md transition-all duration-300 ease-in-out cursor-pointer hover:opacity-75"
-                      )}
-                      width={72}
-                      height={48}
-                      src={img.url}
-                      alt={img.name}
-                    />
-                  ) : null}
-                </div>
-              )
-            })
-        )}
+        {selectedImages.map((img, index) => (
+          <div key={`${img.url}-${index}`}>
+            <Image
+              onClick={() => updatePreview(index)}
+              priority
+              className={cn(
+                index === activeThumbnail[0] ? "opacity-100" : "opacity-75",
+                "rounded-md transition-all duration-300 ease-in-out cursor-pointer hover:opacity-75"
+              )}
+              width={72}
+              height={48}
+              src={img.url}
+              alt={img.name}
+            />
+          </div>
+        ))}
       </div>
     </Carousel>
   )
