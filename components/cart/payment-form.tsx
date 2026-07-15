@@ -1,12 +1,7 @@
 "use client"
 
 import { useCartStore } from "@/lib/client-store"
-import {
-  AddressElement,
-  PaymentElement,
-  useElements,
-  useStripe,
-} from "@stripe/react-stripe-js"
+import { AddressElement, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js"
 import { Button } from "../ui/button"
 import { useState } from "react"
 import { createPaymentIntent } from "@/server/actions/create-payment-intent"
@@ -15,7 +10,7 @@ import { createOrder } from "@/server/actions/create-order"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 
-export default function PaymentForm({ totalPrice }: { totalPrice: number }) {
+export default function PaymentForm({ totalPrice: _totalPrice }: { totalPrice: number }) {
   const stripe = useStripe()
   const elements = useElements()
   const { cart, setCheckoutProgress, clearCart, setCartOpen } = useCartStore()
@@ -24,12 +19,10 @@ export default function PaymentForm({ totalPrice }: { totalPrice: number }) {
   const router = useRouter()
   const { execute } = useAction(createOrder, {
     onSuccess: (data) => {
-      if (data.error) {
-        toast.error(data.error)
-      }
-      if (data.success) {
+      if (data.data?.error) toast.error(data.data.error)
+      if (data.data?.success) {
         setIsLoading(false)
-        toast.success(data.success)
+        toast.success(data.data.success)
         setCheckoutProgress("confirmation-page")
         clearCart()
       }
@@ -45,17 +38,13 @@ export default function PaymentForm({ totalPrice }: { totalPrice: number }) {
     }
     const { error: submitError } = await elements.submit()
     if (submitError) {
-      setErrorMessage(submitError.message!)
+      setErrorMessage(submitError.message || "Payment form error")
       setIsLoading(false)
       return
     }
     const { data } = await createPaymentIntent({
       currency: "usd",
-      cart: cart.map((item) => ({
-        quantity: item.variant.quantity,
-        productID: item.id,
-        variantID: item.variant.variantID,
-      })),
+      cart: cart.map((item) => ({ quantity: item.variant.quantity, productID: item.id, variantID: item.variant.variantID })),
     })
     if (data?.error) {
       setErrorMessage(data.error)
@@ -70,25 +59,19 @@ export default function PaymentForm({ totalPrice }: { totalPrice: number }) {
         clientSecret: data.success.clientSecretID!,
         redirect: "if_required",
         confirmParams: {
-          return_url: "http://localhost:3000/success",
+          return_url: `${window.location.origin}/success`,
           receipt_email: data.success.user as string,
         },
       })
       if (error) {
-        setErrorMessage(error.message!)
+        setErrorMessage(error.message || "Payment failed")
         setIsLoading(false)
         return
-      } else {
-        setIsLoading(false)
-        execute({
-          paymentIntentID: data.success.paymentIntentID,
-          products: cart.map((item) => ({
-            productID: item.id,
-            variantID: item.variant.variantID,
-            quantity: item.variant.quantity,
-          })),
-        })
       }
+      execute({
+        paymentIntentID: data.success.paymentIntentID,
+        products: cart.map((item) => ({ productID: item.id, variantID: item.variant.variantID, quantity: item.variant.quantity })),
+      })
     }
   }
 
@@ -96,10 +79,8 @@ export default function PaymentForm({ totalPrice }: { totalPrice: number }) {
     <form onSubmit={handleSubmit}>
       <PaymentElement />
       <AddressElement options={{ mode: "shipping" }} />
-      <Button
-        className="my-4  w-full"
-        disabled={!stripe || !elements || isLoading}
-      >
+      {errorMessage ? <p className="mt-3 text-sm text-destructive">{errorMessage}</p> : null}
+      <Button className="my-4 w-full" disabled={!stripe || !elements || isLoading}>
         {isLoading ? "Processing..." : "Pay now"}
       </Button>
     </form>
